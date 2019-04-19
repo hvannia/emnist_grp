@@ -6,26 +6,38 @@ import numpy as np
 def getTrainSet():
     train = pd.read_csv('data/emnist-balanced-train.csv', header=None)
     train.head()
-    train_data = train.iloc[:, 1:]  # do not use header column
-    train_data = train_data.values  # make numpy matrix
-    train_labels = train.iloc[:, 0] # header column only
-    train_labels = pd.get_dummies(train_labels) # convert to 0s 1s
-    train_labels.head() 
-    train_labels = train_labels.values #make matrix
+    train_data = train.iloc[:10000, 1:].values  # do not use header column  --test:100
+    train_labels = train.iloc[:10000, 0].values # header column only -TEST 100
+
+    print("train_data",train_data)
+    print("train labels",train_labels)
+    #train_labels = pd.get_dummies(train_labels) # convert to 0s 1s
+    #train_labels.head() 
+    #train_labels = train_labels.values #make matrix
+
     del train
     return train_data,train_labels
 
 def getTestSet():
     test = pd.read_csv('data/emnist-balanced-test.csv', header=None)
-    test_data = test.iloc[:, 1:] # do not use header column   
-    test_data = test_data.values
-    test_labels = test.iloc[:, 0] # header column only
-    test_labels = pd.get_dummies(test_labels)
-    test_labels = test_labels.values
+    test_data = test.iloc[:20, 1:].values # do not use header column   
+    test_labels = test.iloc[:20, 0].values # header column only
+    #test_labels = pd.get_dummies(test_labels)
+    #test_labels = test_labels.values
+    print("test_data",test_data)
+    print("test labels",test_labels)
     del test
-    return test_data,test_labels
+    return test_data, test_labels
 
-
+def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues):
+    plt.figure(1, figsize=(12, 10), dpi=72)
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.show()  
 
 
 class ImageHelper(object):
