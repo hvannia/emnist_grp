@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 from keras.preprocessing import image
 from keras.models import load_model
@@ -8,8 +8,8 @@ from keras import backend
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-model = load_model('mnist_cnn_trained.h5')
-graph = backend.get_session().graph
+#model = load_model('mnist_cnn_trained.h5')
+#raph = backend.get_session().graph
 
 def prepare_image(img):
     # Convert the image to a numpy array
@@ -17,13 +17,11 @@ def prepare_image(img):
     # Scale from 0 to 255
     img /= 255
     # Invert the pixels
-    img = 1 - img
-    # Flatten the image to an array of pixels
-    
+    #img = 1 - img
+    # Flatten the image to an array of pixels  
     #image_array = img.flatten().reshape(-1, 28 * 28)
     #for cnn:
     #image_array=image.expand_dim(axis=2)
-    
     # Return the processed feature array
     return img.reshape(1,28,28,1)
 
@@ -44,9 +42,7 @@ def upload_file():
             #with graph.as_default():
             #    pred = int(model.predict_classes(image_array)[0])
             #return jsonify({'prediction': pred, 'status': 'success'})
-
     return render_template("drawer.html")
-
 
 if __name__ == "__main__":
     app.run(debug=True)
