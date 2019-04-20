@@ -1,0 +1,12 @@
+.canvasBox{
+    border-width:5px;
+    border-color:white;
+    background-color:#444;
+    color:white;
+    padding:10px;
+    float:left;
+    
+}
+.heading, table{
+    font-family: 'Roboto Slab', serif;
+}
