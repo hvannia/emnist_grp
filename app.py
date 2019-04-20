@@ -32,7 +32,8 @@ def upload_file():
         print(request)
         data = request.get_data()
         print(data)
-            
+          # gotta: 
+          #  f=io.Bytes(base64.b64decode(s))  
           #img = image.load_img(filepath, target_size=(28, 28), grayscale=True)
 
             # Convert the 2D image to an array of pixel values

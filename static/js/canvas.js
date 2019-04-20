@@ -23,12 +23,22 @@ function clearme(){
 function calculate(){
     const canvas = document.querySelector('#draw');
     d=canvas.toDataURL("image/png");
+    console.log(d)
+    var url= ''
+    var oReq = new XMLHttpRequest();
+    oReq.open("POST", url, true);
+    oReq.onload = function (oEvent) {
+      // Uploaded.
+    };
+    var blob = new Blob([d], {type:'image/png'});
+    //var blob = new Blob(['abc123'], {type: 'text/plain'});
     
-    /* for debugging only */
+    oReq.send(blob); 
+    /* for debugging only 
     w=window.open('about:blank','image from canvas');
     w.document.write("<img src='"+d+"' alt='from canvas'/>");
     w.document.body.style.background = 'blue';
-    /***********************/
+    ***********************/
 }
 
 function draw(e) {
