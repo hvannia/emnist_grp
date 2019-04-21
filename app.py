@@ -2,10 +2,12 @@ import os
 import io
 import base64
 import binascii
+import PIL
+import numpy as np
 from flask import Flask, request, jsonify, render_template
 
 from keras.preprocessing import image
-#from keras.models import load_model
+from keras.models import load_model
 #from keras import backend
 
 app = Flask(__name__)
@@ -13,6 +15,11 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 
 #model = load_model('mnist_cnn_trained.h5')
 #raph = backend.get_session().graph
+
+cnnmodel = load_model('./static/models/cnnmodel.h5')
+cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
+
+class_map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabdefghnqrt'
 
 def prepare_image(img):
     # Convert the image to a numpy array
@@ -27,6 +34,24 @@ def prepare_image(img):
     #image_array=image.expand_dim(axis=2)
     # Return the processed feature array
     return img.reshape(1,28,28,1)
+
+
+def get_image(data) :
+    img_io = io.BytesIO(base64.b64decode(data.decode().split(',')[1]))
+    img_full = PIL.Image.open(img_io)
+    img_grey = img_full.convert(mode='L')
+    img = img_grey.resize((28, 28), resample=PIL.Image.HAMMING)
+    img_arr = np.asarray(img.getdata()) / 255.0
+    return img_arr.reshape([1,28,28,1])
+
+
+@app.route('/mark', methods=['GET', 'POST'])
+def upload_file_mark():
+    if request.method == 'POST':
+        pred = int(cnnmodel.predict_classes(get_image(request.get_data()))[0])
+        print(f'\n\n ************** Prediction : {pred} {class_map[pred]} \n\n')
+        resp = jsonify({'prediction': pred, 'status':'success'})
+    return render_template("drawer.html")
 
 
 @app.route('/', methods=['GET', 'POST'])
