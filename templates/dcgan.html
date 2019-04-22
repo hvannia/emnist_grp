@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <title>ML</title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
+  <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
+<!-- local-->
+  <link rel="stylesheet" href="../static/styles/bootstrap.min.css">
+  <link href="../static/styles/mlstyles.css" rel="stylesheet">
+  
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="drawer.html">E M N I S T</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarColor03" aria-controls="navbarColor03" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarColor03">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="drawer.html">Home <span class="sr-only"></span></a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="cnn.html">CNN <span class="sr-only"></span></a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="#">DCGAN <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="about.html">About</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="content ">
+	<div class="row ">
+		<div class="col-lg-8">
+			<div class="card mb-3">
+                <h3 class="card-header text-info">Deep Convolutional Generative Adversarial Network</h3>
+                <div class="card-body">
+                  
+                </div>
+                <img style=" width: 100%; display: block;" class="img-fluid" src="../static/images/dcgan_cat.png" alt="CDGAN explained with cat image">
+                <div class="card-body">
+
+                        <h5 class="card-title">Generation of emnist-like images</h5>
+                        <h6 class="card-subtitle text-muted"></h6>
+                </div>
+               
+              </div>
+         </div><!--col4-->
+         <div class="col-lg-4">
+                <img class="img-fluid rounded mx-auto d-block float-left" src="../static/images/dcgan75k50.gif" alt="75ksamples 50 epcos gif">
+         </div>
+     </div><!--row-->
+     <div class="row">
+        <div class="col-3 heading" >
+                    <H5 class="text-center">50K samples / 1 epoch </H5>
+                    <img class="img-fluid rounded mx-auto d-block" src="../static/images/50k50e/image_at_epoch_0001.png" alt="50ksamples at epoch 10">
+        </div><!--col-->
+		<div class="col-3 heading" >
+            <H5 class="text-center">50K samples / 10 epochs </H5>
+            <img class="img-fluid rounded mx-auto d-block" src="../static/images/50k50e/image_at_epoch_0010.png" alt="50ksamples at epoch 10">
+        </div><!--col-->
+        
+        <div class="col-3 heading" >
+                <H5 class="text-center" >50K samples / 30 epochs </H5>
+                <img class="img-fluid rounded mx-auto d-block" src="../static/images/50k50e/image_at_epoch_0030.png" alt="50ksamples at epoch 30">
+        </div><!--col-->
+        <div class="col-3 heading" >
+                <H5 class="text-center">50K samples / 50 epochs</H5>
+                <img class="img-fluid rounded mx-auto d-block" src="../static/images/50k50e/image_at_epoch_0050.png" alt="50ksamples at epoch 50">
+        </div><!--col-->
+	</div><!--row-->
+	<div class="row">
+            <div class="col-3 heading" >
+                    <H5 class="text-center">75K samples / 1 epoch </H5>
+                    <img class="img-fluid rounded mx-auto d-block" src="../static/images/75k50e/image_at_epoch_0001.png" alt="50ksamples at epoch 10">
+        </div><!--col-->
+        <div class="col-3 heading" >
+            <H5 class="text-center">75K samples / 10  epochs</H5>
+            <img class="img-fluid rounded mx-auto d-block" src="../static/images/75k50e/image_at_epoch_0010.png" alt="75k samples at epoch 10">
+        </div><!--col-->
+                    
+        <div class="col-3 heading" >
+            <H5 class="text-center">75K samples / 30 epochs</H5>
+            <img class="img-fluid rounded mx-auto d-block" src="../static/images/75k50e/image_at_epoch_0030.png" alt="75k samples at epoch 30">
+        </div><!--col-->
+         <div class="col-3 heading" >
+            <H5 class="text-center">75K samples / 50 epochs</H5>
+            <img class="img-fluid rounded mx-auto d-block" src="../static/images/75k50e/image_at_epoch_0050.png" alt="75k samples at epoch 50">
+        </div><!--col-->
+	</div><!--row-->
+</div><!--content-->
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="../static/js/canvas.js"></script>
+
+</body>
+</html>
