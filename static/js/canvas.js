@@ -14,31 +14,42 @@ let lastX = 0;
 let lastY = 0;
 
 
-
 function clearme(){
-	const context = canvas.getContext('2d');
-	context.clearRect(0, 0, canvas.width, canvas.height);
+	//const context = canvas.getContext('2d');
+	//context.clearRect(0, 0, canvas.width, canvas.height);
+	ctx.clearRect(0,0,canvas.width, canvas.height);
+	//ctx.fillStyle="black";
+	ctx.fillRect(0,0,canvas.width, canvas.height);
+	
 }
 
 function calculate(){
     const canvas = document.querySelector('#draw');
     d=canvas.toDataURL("image/png");
+	var blob = new Blob([d], {type:'image/png'});
     console.log(d)
-    var url= ''
-    var oReq = new XMLHttpRequest();
-    oReq.open("POST", url, true);
-    oReq.onload = function (oEvent) {
-      // Uploaded.
-    };
-    var blob = new Blob([d], {type:'image/png'});
-    //var blob = new Blob(['abc123'], {type: 'text/plain'});
-    
-    oReq.send(blob); 
+    var url= '/mark'
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST",url, true);
+	xhr.onreadystatechange = function() { // Call a function when the state changes.
+	if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+        result=document.getElementById('result');
+			// Request finished. Do processing here.
+        console.log(this.responseText);
+        result.innerHTML=this.responseText;
+		}
+	}
+    xhr.send(blob); 
     /* for debugging only 
     w=window.open('about:blank','image from canvas');
     w.document.write("<img src='"+d+"' alt='from canvas'/>");
     w.document.body.style.background = 'blue';
     ***********************/
+}
+function process_result(){
+   /* d3.json("/mark").then(function(metadata){
+        var level="";
+    });*/
 }
 
 function draw(e) {

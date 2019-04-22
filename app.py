@@ -13,28 +13,10 @@ from keras.models import load_model
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
-#model = load_model('mnist_cnn_trained.h5')
-#raph = backend.get_session().graph
-
 cnnmodel = load_model('./static/models/cnnmodel.h5')
 cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
 
 class_map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabdefghnqrt'
-
-def prepare_image(img):
-    # Convert the image to a numpy array
-    img = image.img_to_array(img)
-    # Scale from 0 to 255
-    img /= 255
-    # Invert the pixels
-    #img = 1 - img
-    # Flatten the image to an array of pixels  
-    image_array = img.flatten().reshape(-1, 28 * 28)
-    #for cnn:
-    #image_array=image.expand_dim(axis=2)
-    # Return the processed feature array
-    return img.reshape(1,28,28,1)
-
 
 def get_image(data) :
     img_io = io.BytesIO(base64.b64decode(data.decode().split(',')[1]))
@@ -47,15 +29,19 @@ def get_image(data) :
 
 @app.route('/mark', methods=['GET', 'POST'])
 def upload_file_mark():
+    print("In mark route")
     if request.method == 'POST':
+        print("starting prediction..getting magic ball")
         pred = int(cnnmodel.predict_classes(get_image(request.get_data()))[0])
         print(f'\n\n ************** Prediction : {pred} {class_map[pred]} \n\n')
         resp = jsonify({'prediction': pred, 'status':'success'})
-    return render_template("drawer.html")
+        return resp 
+    render_template("drawer.html")
 
 
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
+    print("In /route")
     if request.method == 'POST':
         #print(request)
         data = request.get_data()
@@ -66,17 +52,6 @@ def upload_file():
         with open(filename, 'wb') as f:
             f.write(imgdata)    
         ##  end save
-        encoded=binascii.b2a_base64(data)
-        fio=io.BytesIO(encoded)
-        print('bytesio:',f)
-
-        img = image.load_img('drawing.jpg', target_size=(280, 280))
-        image_array = prepare_image(img)
-        print(image_array)
-            
-            #with graph.as_default():
-            #    pred = int(model.predict_classes(image_array)[0])
-            #return jsonify({'prediction': pred, 'status': 'success'})
     return render_template("drawer.html")
 
 if __name__ == "__main__":
