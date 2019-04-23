@@ -31,28 +31,31 @@ def get_image(data) :
 def upload_file_mark():
     print("In mark route")
     if request.method == 'POST':
-        print("starting prediction..getting magic ball")
-        pred = int(cnnmodel.predict_classes(get_image(request.get_data()))[0])
-        print(f'\n\n ************** Prediction : {pred} {class_map[pred]} \n\n')
-        resp = jsonify({'prediction': pred, 'status':'success'})
-        return resp 
-    render_template("drawer.html")
-
-
-@app.route('/', methods=['GET', 'POST'])
-def upload_file():
-    print("In /route")
-    if request.method == 'POST':
-        #print(request)
-        data = request.get_data()
-        # save image to disk (for verification)
+        data=request.get_data()
+         # save image to disk (for verification)
         image_data=data[22:] # remove image filetype info
         imgdata = base64.b64decode(image_data)
         filename = 'drawing.jpg'  
         with open(filename, 'wb') as f:
             f.write(imgdata)    
+            print("Saved image for verification")
         ##  end save
+        print("starting prediction... getting magic ball")
+        pred = int(cnnmodel.predict_classes(get_image(data))[0])
+        print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
+        resp ="Predicted value: "+class_map[pred]
+        return resp 
+    render_template("drawer.html")
+
+@app.route('/', methods=['GET', 'POST'])
+def iAmRoot():
+    print("In /")
     return render_template("drawer.html")
+
+@app.route('/dcgan')
+def dcgan():
+    print('In /dcgan')
+    return render_template('dcgan.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
