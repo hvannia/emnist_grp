@@ -7,7 +7,7 @@ ctx.fillRect(0, 0, canvas.width, canvas.height);
 ctx.strokeStyle = 'white';
 ctx.lineJoin = 'round';
 ctx.lineCap = 'round';
-ctx.lineWidth = 27;
+ctx.lineWidth = 17;
 
 let isDrawing = false;
 let lastX = 0;
