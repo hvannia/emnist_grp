@@ -15,6 +15,7 @@ from flask import Flask, request, jsonify, render_template
 from keras.preprocessing import image
 from keras.models import load_model
 
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
@@ -73,7 +74,8 @@ def get_image(data) :
     newImg=np.zeros((28, 28))
     #square[2:8, 2:8] = 1
     
-    newImg[8:19,11:17]=newarea
+    #newImg[8:19,11:17]=newarea
+    newImg[startx:startx+newarea.shape[0],starty:starty+newarea.shape[1]]=newarea
         
        # startx:startx+newarea.shape[0], starty:starty.shape[1]]=newImg
     print(newImg)
@@ -113,19 +115,27 @@ def upload_file_mark():
         print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
         resp ="Predicted value: "+class_map[pred]
         return resp 
-    render_template("drawer.html")
 
-
+    nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    return render_template('drawer.html', nav_dict = nav_dict)
 
 @app.route('/', methods=['GET', 'POST'])
 def iAmRoot():
     print("In /")
-    return render_template("drawer.html")
+    nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    return render_template('drawer.html', nav_dict = nav_dict)
 
 @app.route('/dcgan')
 def dcgan():
     print('In /dcgan')
-    return render_template('dcgan.html')
+    nav_dict = {'home':'not-active', 'cnn':'not-active', 'dcgan':'active', 'about':'not-active'}
+    return render_template('dcgan.html', nav_dict = nav_dict)
+
+@app.route('/cnn')
+def cnn():
+    print('In /cnn')
+    nav_dict = {'home':'not-active', 'cnn':'active', 'dcgan':'not-active', 'about':'not-active'}
+    return render_template('emnist_cnn.html', nav_dict = nav_dict)
 
 if __name__ == "__main__":
     app.run(debug=True)
