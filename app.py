@@ -1,14 +1,15 @@
 # preinstalls:
 # tensorflow (using 1.13.1)
 # scikit-image
-
+# Pillow
 import os
 import io
 import base64
 import binascii
 import PIL
 import numpy as np
-
+#from io import BytesIO
+#from PIL import image
 from skimage.feature import corner_harris, corner_peaks
 from flask import Flask, request, jsonify, render_template
 
@@ -28,94 +29,52 @@ class_map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabdefghnqrt'
 def get_image(data) :
     img_io = io.BytesIO(base64.b64decode(data.decode().split(',')[1]))
     img_full = PIL.Image.open(img_io)
-    #(8-bit pixels, black and white), 1 for 1bit b&w
-    img_grey = img_full.convert(mode='L')  
-    #resampling filter (map multiple input pixels to a single output pixel)
-    #print('Img gr converted to 8bit',img_grey)
-
-
-
-    img = img_grey.resize((28, 28), resample=PIL.Image.HAMMING)
-    #print('img',img)
+    img_grey = img_full.convert(mode='L')  #(8-bit pixels, black and white)
+    img = img_grey.resize((28, 28), resample=PIL.Image.HAMMING) #(map multiple input pixels to a single output pixel)
     img_array=np.asarray(img.getdata()).reshape(28,28)
-    print('img as array 28x28 not yet normalized\n', img_array)
+    #print('img as array 28x28 not yet normalized\n', img_array)
     #print('shape',img_array.shape)
-    
-    # FIND AREA W dwg
-    sqsize=img_array.shape[0]
-    minx = sqsize-1
-    miny = sqsize-1
-    maxx=0
-    maxy=0
-
-    for i in range(0,sqsize-1): 
-        for j in range(0,sqsize-1): 
-            if img_array[i,j]!=0: 
-                if i < minx: 
-                    minx=i 
-                if i > maxx: 
-                    maxx=i 
-                if j< miny: 
-                    miny=j 
-                if j>maxy: 
-                    maxy=j 
-    #[]
-    newarea=img_array[minx:maxx+1,miny:maxy+1]
-    print('zoom area\n',newarea)
-    print('new area shape: ',newarea.shape)
-    #print('reshaped\n',newarea.reshape(28,28))
-
-    #center shape
-    startx=(sqsize-newarea.shape[0])//2
-    
-    starty=(sqsize-newarea.shape[1])//2
-    print('new x:',startx)
-    print('new y:',starty)
-    newImg=np.zeros((28, 28))
-    #square[2:8, 2:8] = 1
-    
-    #newImg[8:19,11:17]=newarea
-    newImg[startx:startx+newarea.shape[0],starty:starty+newarea.shape[1]]=newarea
-        
-       # startx:startx+newarea.shape[0], starty:starty.shape[1]]=newImg
-    print(newImg)
-
-
-
-
-
-
     img_arr = np.asarray(img.getdata()) / 255.0
     return img_arr.reshape([1,28,28,1])
 
-def saveImageFile(data):
+def saveImageFile(data, filename):
     image_data=data[22:] # remove image filetype info
     imgdata = base64.b64decode(image_data)
-    filename = 'drawing.jpg'  
+    #filename = 'drawing.jpg'  
     with open(filename, 'wb') as f:
 	    f.write(imgdata)
 
 def preprocessImage(doodle):
-    #save original as reference (temp)
-    saveImageFile(doodle)
-    #convert to array
-    ppImage=get_image(doodle)
-    return '' #preprocesedImage
+#prepare for get_image
+#im=base64.b64decode(doodle[22:])
+    im=PIL.Image.open(io.BytesIO(base64.b64decode(doodle[22:])))
+    imbw=im.convert('L')
+    cropped=imbw.crop(imbw.getbbox())
+    resized=cropped.resize([28,28])
+    resized.save('\static\images\processed.jpg')
+    arr=np.asarray(resized.getdata())/255.0
+    arrmtrx=arr.reshape([1,28,28,1])
+    return arrmtrx
 
+## get data from webpage, run prediction for original and preprocessed images
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     print("In predict")
     if request.method == 'POST':
-        pimage2= preprocessImage(request.get_data())  # get ROI, 'zoom' and center
-        pimage=get_image(request.get_data())
-        #do prediction
-        print("starting prediction... getting magic ball")
+        saveImageFile(request.get_data(),'\static\images\original.jpg')
+        image=get_image(request.get_data())
+        print("\n starting prediction of original image...  ")
+        pred = int(cnnmodel.predict_classes(image)[0])
+        print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
+        resp ="Prediction for original iamge: "+class_map[pred]
+        pimage=preprocessImage(request.get_data())
+        #saveImageFile(pimage,'processed.jpg')
+        print("\n starting prediction of preprocessed image...  ")
         pred = int(cnnmodel.predict_classes(pimage)[0])
         print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
-        resp ="Predicted value: "+class_map[pred]
+        resp +="\n Prediction for processed iamge: "+class_map[pred]
         return resp 
-
     nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('drawer.html', nav_dict = nav_dict)
 
@@ -139,10 +98,3 @@ def cnn():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
-
-
-''' References
-https://scikit-image.org/docs/dev/auto_examples/features_detection/plot_corner.html#sphx-glr-auto-examples-features-detection-plot-corner-py
-
-'''
