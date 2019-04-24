@@ -28,7 +28,7 @@ function calculate(){
     d=canvas.toDataURL("image/png");
 	var blob = new Blob([d], {type:'image/png'});
     console.log(d)
-    var url= '/mark'
+    var url= '/predict'
 	var xhr = new XMLHttpRequest();
 	xhr.open("POST",url, true);
 	xhr.onreadystatechange = function() { // Call a function when the state changes.
@@ -47,7 +47,7 @@ function calculate(){
     ***********************/
 }
 function process_result(){
-   /* d3.json("/mark").then(function(metadata){
+   /* d3.json("/predict").then(function(metadata){
         var level="";
     });*/
 }

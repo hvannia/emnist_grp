@@ -103,9 +103,9 @@ def preprocessImage(doodle):
     return '' #preprocesedImage
 
 
-@app.route('/mark', methods=['GET', 'POST'])
-def upload_file_mark():
-    print("In mark route")
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
+    print("In predict")
     if request.method == 'POST':
         pimage2= preprocessImage(request.get_data())  # get ROI, 'zoom' and center
         pimage=get_image(request.get_data())
@@ -119,9 +119,9 @@ def upload_file_mark():
     nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('drawer.html', nav_dict = nav_dict)
 
-@app.route('/', methods=['GET', 'POST'])
-def iAmRoot():
-    print("In /")
+@app.route('/')
+def root():
+    print("In root")
     nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('drawer.html', nav_dict = nav_dict)
 
