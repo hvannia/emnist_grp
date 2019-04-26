@@ -26,7 +26,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 #app.config['SECRET_KEY'] = 'seeecretkey'
 
-cnnmodel = load_model('./static/models/cnnmodel.h5')
+cnnmodel = load_model('./static/models/cnn_model.hd5')
 cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
 
 class_map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabdefghnqrt'
@@ -104,20 +104,26 @@ def predict():
 @app.route('/')
 def root():
     print("In root")
-    nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('drawer.html', nav_dict = nav_dict, predict='',imageurls='')
 
 @app.route('/dcgan')
 def dcgan():
     print('In /dcgan')
-    nav_dict = {'home':'not-active', 'cnn':'not-active', 'dcgan':'active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'active', 'about':'not-active'}
     return render_template('dcgan.html', nav_dict = nav_dict)
 
 @app.route('/cnn')
 def cnn():
     print('In /cnn')
-    nav_dict = {'home':'not-active', 'cnn':'active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'cnn':'active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('emnist_cnn.html', nav_dict = nav_dict)
+
+@app.route('/cnn_imggen')
+def cnn_imggen():
+    print('In /cnn_imggen')
+    nav_dict = {'home':'not-active', 'cnn':'not-active', 'imgen':'active', 'dcgan':'not-active', 'about':'not-active'}
+    return render_template('emnist_cnn_image_gen.html', nav_dict = nav_dict)
 
 if __name__ == "__main__":
     app.run(debug=True)
