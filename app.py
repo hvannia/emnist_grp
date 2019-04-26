@@ -9,11 +9,7 @@ import binascii
 import PIL
 import numpy as np
 import datetime
-#from jinja2 import Template
 
-#from io import BytesIO
-#from PIL import image
-#from skimage.feature import corner_harris, corner_peaks
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 
 
@@ -24,7 +20,6 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-#app.config['SECRET_KEY'] = 'seeecretkey'
 
 cnnmodel = load_model('./static/models/cnn_model.hd5')
 cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
@@ -37,23 +32,18 @@ def get_image(data) :
     img_grey = img_full.convert(mode='L')  #(8-bit pixels, black and white)
     img = img_grey.resize((28, 28), resample=PIL.Image.HAMMING) #(map multiple input pixels to a single output pixel)
     img_array=np.asarray(img.getdata()).reshape(28,28)
-    #print('img as array 28x28 not yet normalized\n', img_array)
-    #print('shape',img_array.shape)
     img_arr = np.asarray(img.getdata()) / 255.0
     return img_arr.reshape([1,28,28,1])
 
 def saveImageFile(data, filename):
     image_data=data[22:] # remove image filetype info
     imgdata = base64.b64decode(image_data)
-    #filename = 'drawing.jpg'  
     with open(filename, 'wb') as f:
 	    f.write(imgdata)
 
 def preprocessImage(doodle,url):
     im=PIL.Image.open(io.BytesIO(base64.b64decode(doodle[22:])))
     imbw=im.convert('L')
-    cropped=imbw.crop(imbw.getbbox())
-    
     #####
     bbox=imbw.getbbox()
     print(bbox)
@@ -64,9 +54,18 @@ def preprocessImage(doodle,url):
     print('proportion height/w : ',hw)
     print('proportion width/h', wh)
 
-    if ( hw > 2.5 or hw < 0.25 or wh>2.5 or wh <0.25):
-        print('disproportional')
-    #####
+    if hw < 0.5: 
+        print('too wide')
+        newbox=(bbox[0],bbox[1]+(height//2)-(width//2),bbox[2],bbox[3]-(height//2)+(width//2) )
+        print(newbox)
+        cropped=imbw.crop(newbox)
+    elif wh<0.5:
+        print('too tall')
+        newbox=( bbox[0]+(width//2)-(height//2), bbox[1], bbox[2]-(width//2)+(height//2), bbox[3])
+        print(newbox)
+        cropped=imbw.crop(newbox)
+    else:
+        cropped=imbw.crop(imbw.getbbox())
     resized=cropped.resize([28,28])
     resized.save(url)
     arr=np.asarray(resized.getdata())/255.0
@@ -78,25 +77,18 @@ def preprocessImage(doodle,url):
 @app.route('/predict', methods=['GET', 'POST']) 
 def predict():
     print("In predict")
-   #print(imagen)
     if request.method == 'POST':
-        #print(request.get_data()[:50])
         dtstr=datetime.datetime.now().strftime('%y%m%d%M%S')
         originalurl='./static/images/original'+dtstr+'.jpg'
         processedurl='./static/images/processed'+dtstr+'.jpg'
-
         saveImageFile(request.get_data(),originalurl)
         image=get_image(request.get_data())
         predOriginal = class_map[int(cnnmodel.predict_classes(image)[0])]
-        #print("\n starting prediction of original image...  ")
-        
         #print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
         pimage=preprocessImage(request.get_data(),processedurl)
         predProcessed = class_map[int(cnnmodel.predict_classes(pimage)[0])]
         #print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
         predictData={'original':predOriginal,'preprocessed':predProcessed,'originalUrl':originalurl, 'processedUrl':processedurl}
-        #imageurls={'original':originalurl,'preprocessed':processedurl}
-        #print(type(predict))
         print(predictData)
     return jsonify(predictData)
  
