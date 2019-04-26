@@ -24,7 +24,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['SECRET_KEY'] = 'seeecretkey'
+#app.config['SECRET_KEY'] = 'seeecretkey'
 
 cnnmodel = load_model('./static/models/cnnmodel.h5')
 cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
@@ -53,6 +53,20 @@ def preprocessImage(doodle,url):
     im=PIL.Image.open(io.BytesIO(base64.b64decode(doodle[22:])))
     imbw=im.convert('L')
     cropped=imbw.crop(imbw.getbbox())
+    
+    #####
+    bbox=imbw.getbbox()
+    print(bbox)
+    height=bbox[3]-bbox[1]
+    width=bbox[2]-bbox[0]
+    hw=height/width
+    wh=width/height
+    print('proportion height/w : ',hw)
+    print('proportion width/h', wh)
+
+    if ( hw > 2.5 or hw < 0.25 or wh>2.5 or wh <0.25):
+        print('disproportional')
+    #####
     resized=cropped.resize([28,28])
     resized.save(url)
     arr=np.asarray(resized.getdata())/255.0
@@ -85,11 +99,7 @@ def predict():
         #print(type(predict))
         print(predictData)
     return jsonify(predictData)
-    #else:
-    #   predict={'original':'x','preprocessed':'y'}
-    #   imageurls={'original':'x','preprocessed':'y'}
-    #   nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
-     #  return render_template('drawer.html', nav_dict = nav_dict, predict=predict,imageurls=imageurls)
+ 
 
 @app.route('/')
 def root():
