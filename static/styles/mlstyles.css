@@ -10,3 +10,50 @@
 .heading, table{
     font-family: 'Roboto Slab', serif;
 }
+
+
+#originalCard{max-width: 220px;}
+#processedCard{max-width: 220px;}
+#txtWidth{color:orange;}
+#calcButtons{margin-left:50px;}
+
+.slidecontainer {
+    width: 220px;
+    
+  }
+  
+  .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.8;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+  }
+  
+  .slider:hover {
+    opacity: 1;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 23px;
+    height: 24px;
+    border: 0;
+    background: url('orangeSquare.png');
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: 23px;
+    height: 24px;
+    border: 0;
+    background: url('orangeSquare.png');
+    border-radius: 50%;
+    cursor: pointer;
+  }
