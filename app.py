@@ -8,10 +8,14 @@ import base64
 import binascii
 import PIL
 import numpy as np
+import datetime
+#from jinja2 import Template
+
 #from io import BytesIO
 #from PIL import image
-from skimage.feature import corner_harris, corner_peaks
-from flask import Flask, request, jsonify, render_template
+#from skimage.feature import corner_harris, corner_peaks
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
+
 
 from keras.preprocessing import image
 from keras.models import load_model
@@ -20,6 +24,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['SECRET_KEY'] = 'seeecretkey'
 
 cnnmodel = load_model('./static/models/cnnmodel.h5')
 cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
@@ -44,45 +49,53 @@ def saveImageFile(data, filename):
     with open(filename, 'wb') as f:
 	    f.write(imgdata)
 
-def preprocessImage(doodle):
-#prepare for get_image
-#im=base64.b64decode(doodle[22:])
+def preprocessImage(doodle,url):
     im=PIL.Image.open(io.BytesIO(base64.b64decode(doodle[22:])))
     imbw=im.convert('L')
     cropped=imbw.crop(imbw.getbbox())
     resized=cropped.resize([28,28])
-    resized.save('\static\images\processed.jpg')
+    resized.save(url)
     arr=np.asarray(resized.getdata())/255.0
     arrmtrx=arr.reshape([1,28,28,1])
     return arrmtrx
 
 ## get data from webpage, run prediction for original and preprocessed images
 
-@app.route('/predict', methods=['GET', 'POST'])
+@app.route('/predict', methods=['GET', 'POST']) 
 def predict():
     print("In predict")
+   #print(imagen)
     if request.method == 'POST':
-        saveImageFile(request.get_data(),'\static\images\original.jpg')
+        #print(request.get_data()[:50])
+        dtstr=datetime.datetime.now().strftime('%y%m%d%M%S')
+        originalurl='./static/images/original'+dtstr+'.jpg'
+        processedurl='./static/images/processed'+dtstr+'.jpg'
+
+        saveImageFile(request.get_data(),originalurl)
         image=get_image(request.get_data())
-        print("\n starting prediction of original image...  ")
-        pred = int(cnnmodel.predict_classes(image)[0])
-        print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
-        resp ="Prediction for original iamge: "+class_map[pred]
-        pimage=preprocessImage(request.get_data())
-        #saveImageFile(pimage,'processed.jpg')
-        print("\n starting prediction of preprocessed image...  ")
-        pred = int(cnnmodel.predict_classes(pimage)[0])
-        print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
-        resp +="\n Prediction for processed iamge: "+class_map[pred]
-        return resp 
-    nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
-    return render_template('drawer.html', nav_dict = nav_dict)
+        predOriginal = class_map[int(cnnmodel.predict_classes(image)[0])]
+        #print("\n starting prediction of original image...  ")
+        
+        #print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
+        pimage=preprocessImage(request.get_data(),processedurl)
+        predProcessed = class_map[int(cnnmodel.predict_classes(pimage)[0])]
+        #print(f'\n ************** Prediction : {pred} {class_map[pred]} \n\n')
+        predictData={'original':predOriginal,'preprocessed':predProcessed,'originalUrl':originalurl, 'processedUrl':processedurl}
+        #imageurls={'original':originalurl,'preprocessed':processedurl}
+        #print(type(predict))
+        print(predictData)
+    return jsonify(predictData)
+    #else:
+    #   predict={'original':'x','preprocessed':'y'}
+    #   imageurls={'original':'x','preprocessed':'y'}
+    #   nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+     #  return render_template('drawer.html', nav_dict = nav_dict, predict=predict,imageurls=imageurls)
 
 @app.route('/')
 def root():
     print("In root")
     nav_dict = {'home':'active', 'cnn':'not-active', 'dcgan':'not-active', 'about':'not-active'}
-    return render_template('drawer.html', nav_dict = nav_dict)
+    return render_template('drawer.html', nav_dict = nav_dict, predict='',imageurls='')
 
 @app.route('/dcgan')
 def dcgan():

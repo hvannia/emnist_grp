@@ -12,45 +12,37 @@ ctx.lineWidth = 17;
 let isDrawing = false;
 let lastX = 0;
 let lastY = 0;
-
+var gdata;
 
 function clearme(){
-	//const context = canvas.getContext('2d');
-	//context.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.clearRect(0,0,canvas.width, canvas.height);
-	//ctx.fillStyle="black";
 	ctx.fillRect(0,0,canvas.width, canvas.height);
-	
 }
 
 function calculate(){
     const canvas = document.querySelector('#draw');
     d=canvas.toDataURL("image/png");
-	var blob = new Blob([d], {type:'image/png'});
     console.log(d)
-    var url= '/predict'
-	var xhr = new XMLHttpRequest();
-	xhr.open("POST",url, true);
-	xhr.onreadystatechange = function() { // Call a function when the state changes.
-	if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-        result=document.getElementById('result');
-			// Request finished. Do processing here.
-        console.log(this.responseText);
-        result.innerHTML=this.responseText;
-		}
-	}
-    xhr.send(blob); 
+   
+    d3.json("/predict",{method:'POST', body:d}).then(function(data){
+        console.log(data);
+        gdata=data;
+        document.querySelector('#originalCard').style.display="block";
+        document.querySelector('#processedCard').style.display="block";
+        document.querySelector('#originalPred').textContent='class: '+data.original;
+        document.querySelector('#processedPred').textContent='class: '+data.preprocessed;
+        document.querySelector('#originalImg').src=data.originalUrl;
+        document.querySelector('#procImg').src=data.processedUrl
+
+
+    });
     /* for debugging only 
     w=window.open('about:blank','image from canvas');
     w.document.write("<img src='"+d+"' alt='from canvas'/>");
     w.document.body.style.background = 'blue';
     ***********************/
 }
-function process_result(){
-   /* d3.json("/predict").then(function(metadata){
-        var level="";
-    });*/
-}
+
 
 function draw(e) {
   if (!isDrawing) return; // stop the fn from running when they are not moused down
@@ -70,6 +62,9 @@ canvas.addEventListener('mousedown', (e) => {
 });
 
 
+
+document.querySelector('#originalCard').style.display="none";
+document.querySelector('#processedCard').style.display="none";
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', () => isDrawing = false);
 canvas.addEventListener('mouseout', () => isDrawing = false);

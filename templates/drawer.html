@@ -8,7 +8,7 @@
   <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">-->
   <link href="https://fonts.googleapis.com/css?family=Roboto+Slab" rel="stylesheet">
 <!-- local-->
-  <link rel="stylesheet" href="../static/styles/bootstrap.min.css">
+  <link href="../static/styles/bootstrap.min.css" rel="stylesheet" >
   <link href="../static/styles/mlstyles.css" rel="stylesheet">
   
 </head>
@@ -16,56 +16,48 @@
 		{% include 'nav_bar.html' %}
 		
 <div class="content ">
-	<div class="row clearfix">
+	<div class="row ">
+		<div class="col-12">
+		 	<h3 class="text-info">Model results for Kaggle/EMNIST balanced dataset</h3>
+		 	<p><span class="text-warning">Training Data Samples:</span> 112,800  <br />
+					<span class="text-warning">Test Data Samples: </span>18,800 <br />
+					<span class="text-warning">Target classes: </span>47 : <br/>[ 
+					0 1 2 3 4 5 6 7 8 9 
+					A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b d e f g h n q r t ]
+				</p>
+		</div>
+	</div>
+	<div class="row">
 		<div class="col-lg-4">
 			<canvas class="canvasBox rounded"  id="draw" width="280" height="280" ></canvas><br />
 			<p class="text-center">
-				<a class="btn btn-default" onclick='clearme()'><i class="fa fa-eraser" aria-hidden="true"><!--a--></i></a>
-                <a class="btn btn-default" onclick='calculate()'><i class="fas fa-calculator"></i><!--a--></i></a>
-              
+				<a class="btn btn-default" onclick="clearme()"><i class="fa fa-eraser" aria-hidden="true"><!--a--></i></a>
+                <a class="btn btn-default" onclick="calculate()"><i class="fas fa-calculator"><!--a--></i></a>
 			</p>
 		</div><!--col4-->
-		<div class="col-8 heading" >
-        <h3 class="text-info">Model results for Kaggle/EMNIST balanced dataset</h3>
-        
-		<p><span class="text-warning">Training Data Samples:</span> 112,800  <br />
-			<span class="text-warning">Test Data Samples: </span>18,800 <br />
-            <span class="text-warning">Target classes: </span>47 : <br/>[ 
-            0 1 2 3 4 5 6 7 8 9 
-            A B C D E F G H I J K L M N O P Q R S T U V W X Y Z a b d e f g h n q r t ]
-        </p>
-		
-		<table class="table table-hover ">
-			<thead>
-				<tr>
-				  <th scope="col">Model</th>
-				  <th scope="col">Specs</th>
-				  <th scope="col">Accuracy</th>
-				  <th scope="col"></th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr class="table-secondary">
-				  <th scope="row">Convolutional Network </th>
-				  <td>Epochs=</td>
-				  <td>0.</td>
-				  <td></td>
-				</tr>
-				<tr class="table-secondary">
-				  <th scope="row"></th>
-				  <td></td>
-				  <td></td>
-				  <td></td>
-				</tr>
-				
-			</tbody>
-            </table>
-            <div id="result"></div>
-		</div><!--col8-->
-	</div><!--row-->
-	<div class="row">
+			<div class="col-4" id="originalCard">
+				<div class="card border-info mb-3" style="max-width: 20rem;">
+				  <div class="card-header">Original</div>
+				  <div class="card-body">
+					<h4 class="card-title" id="originalPred"> </h4>
+					<img id="originalImg"; style="height: 140px; width: 140px; " src="" alt="Original ">
+				  </div>
+				</div>
+			</div>
+			<div class="col-4" id="processedCard">
+				<div class="card border-info mb-3" style="max-width: 20rem;">
+				  <div class="card-header">Processed</div>
+				  <div class="card-body">
+					<h4 class="card-title" id="processedPred"> </h4>
+					<img id="procImg" style="height: 140px; width: 140px; " src="" alt="Processed">
+				  </div>
+				</div>
+			</div>
 	
-	</div><!--row-->
+	
+            
+		</div><!--row-->
+
 	
 </div><!--content-->
 
