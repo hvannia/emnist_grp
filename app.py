@@ -129,7 +129,7 @@ def cnn():
 @app.route('/rForest')
 def rf():
     print('In /rForest')
-    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'rForest':'active','dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'rforest':'active','dcgan':'not-active', 'about':'not-active'}
     return render_template('rForest.html', nav_dict = nav_dict)
 
 @app.route('/cnn_imggen')
