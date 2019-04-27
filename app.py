@@ -111,25 +111,31 @@ def predict():
 @app.route('/')
 def root():
     print("In root")
-    nav_dict = {'home':'active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'rforest':'not-active','dcgan':'not-active', 'about':'not-active'}
     return render_template('drawer.html', nav_dict = nav_dict, predict='',imageurls='')
 
 @app.route('/dcgan')
 def dcgan():
     print('In /dcgan')
-    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'rforest':'not-active','dcgan':'active', 'about':'not-active'}
     return render_template('dcgan.html', nav_dict = nav_dict)
 
 @app.route('/cnn')
 def cnn():
     print('In /cnn')
-    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'active', 'imgen':'not-active', 'rforest':'not-active','dcgan':'not-active', 'about':'not-active'}
     return render_template('emnist_cnn.html', nav_dict = nav_dict)
+
+@app.route('/rForest')
+def rf():
+    print('In /rForest')
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'rForest':'active','dcgan':'not-active', 'about':'not-active'}
+    return render_template('rForest.html', nav_dict = nav_dict)
 
 @app.route('/cnn_imggen')
 def cnn_imggen():
     print('In /cnn_imggen')
-    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'active', 'rforest':'not-active','dcgan':'not-active', 'about':'not-active'}
     return render_template('emnist_cnn_image_gen.html', nav_dict = nav_dict)
 
 @app.route("/getdata/<category>")
@@ -146,7 +152,7 @@ def get_data(category):
         fileContent = file.read()
 
     plot = f'data:image/png;base64,{base64.b64encode(fileContent).decode()}'
-    nav_dict = {'home':'not-active', 'data':'active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'active', 'cnn':'not-active', 'imgen':'not-active', 'rforest':'not-active','dcgan':'not-active', 'about':'not-active'}
     
     return render_template("data.html", plot=plot, ref_list=cat_list, nav_dict=nav_dict)
 
