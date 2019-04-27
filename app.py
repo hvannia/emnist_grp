@@ -8,24 +8,39 @@ import base64
 import binascii
 import PIL
 import numpy as np
+import pandas as pd
 import datetime
+import matplotlib
+from cnn_plot import rotate, get_cat_index, plot_grid_40
 
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
-
 
 from keras.preprocessing import image
 from keras.models import load_model
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
+# Initialize/Configure the app
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 
+# Load the model into the app
 cnnmodel = load_model('./static/models/cnn_model.hd5')
 cnnmodel._make_predict_function()   # To mitigate ValueError when call predict
 
+# Read in EMNIST test data set (train data set too large)
 class_map = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabdefghnqrt'
+cat_list  = list(class_map)
+data_file = './static/data/emnist-balanced-test.csv'
+test   = pd.read_csv(data_file,  delimiter = ',')
+test_x = test.iloc[:,1:]
+test_y = test.iloc[:,0]
+test_x = np.asarray(test_x)
+test_x = np.apply_along_axis(rotate, 1, test_x)
+test_x = test_x.astype('float32')
+test_x /= 255
 
+# Utility function definitions
 def get_image(data) :
     img_io = io.BytesIO(base64.b64decode(data.decode().split(',')[1]))
     img_full = PIL.Image.open(img_io)
@@ -96,26 +111,44 @@ def predict():
 @app.route('/')
 def root():
     print("In root")
-    nav_dict = {'home':'active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('drawer.html', nav_dict = nav_dict, predict='',imageurls='')
 
 @app.route('/dcgan')
 def dcgan():
     print('In /dcgan')
-    nav_dict = {'home':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'active', 'about':'not-active'}
     return render_template('dcgan.html', nav_dict = nav_dict)
 
 @app.route('/cnn')
 def cnn():
     print('In /cnn')
-    nav_dict = {'home':'not-active', 'cnn':'active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('emnist_cnn.html', nav_dict = nav_dict)
 
 @app.route('/cnn_imggen')
 def cnn_imggen():
     print('In /cnn_imggen')
-    nav_dict = {'home':'not-active', 'cnn':'not-active', 'imgen':'active', 'dcgan':'not-active', 'about':'not-active'}
+    nav_dict = {'home':'not-active', 'data':'not-active', 'cnn':'not-active', 'imgen':'active', 'dcgan':'not-active', 'about':'not-active'}
     return render_template('emnist_cnn_image_gen.html', nav_dict = nav_dict)
+
+@app.route("/getdata/<category>")
+def get_data(category):
+    print(f'Entry getdata {category}')
+    
+    if category =="_" :
+        data_plt = plot_grid_40(class_map, test_y, test_x, get_cat_index(class_map, test_y))
+    else :
+        data_plt = plot_grid_40(class_map, test_y, test_x, get_cat_index(class_map, test_y, category))
+
+    data_plt.savefig('./static/images/tmp.png', format='png')
+    with open('./static/images/tmp.png', mode='rb') as file: 
+        fileContent = file.read()
+
+    plot = f'data:image/png;base64,{base64.b64encode(fileContent).decode()}'
+    nav_dict = {'home':'not-active', 'data':'active', 'cnn':'not-active', 'imgen':'not-active', 'dcgan':'not-active', 'about':'not-active'}
+    
+    return render_template("data.html", plot=plot, ref_list=cat_list, nav_dict=nav_dict)
 
 if __name__ == "__main__":
     app.run(debug=True)
